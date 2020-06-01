@@ -1,5 +1,8 @@
 do_state_tasks <- function(oldest_active_sites) {
 
+  # split the tasks
+  split_inventory('1_fetch/tmp/state_splits.yml', oldest_active_sites)
+
   # Define task table rows
   tasks <- oldest_active_sites$state_cd
 
@@ -8,7 +11,7 @@ do_state_tasks <- function(oldest_active_sites) {
     step_name = 'download',
     target_name = function(task_name, ...) { sprintf('%s_data', task_name)},
     command = function(task_name, ...) {
-      sprintf("get_site_data(oldest_active_sites, I('%s'), parameter)", task_name)
+      sprintf("get_site_data('1_fetch/tmp/inventory_%s.tsv', parameter)", task_name)
     }
   )
 
@@ -33,4 +36,14 @@ do_state_tasks <- function(oldest_active_sites) {
 
   # Return nothing to the parent remake file
   return()
+}
+
+split_inventory <- function(summary_file, sites_info) {
+  fnames <- sapply(unique(sites_info$state_cd), function(state) {
+    dat <- dplyr::filter(sites_info, state_cd == state)
+    fname <- sprintf('1_fetch/tmp/inventory_%s.tsv', state)
+    readr::write_tsv(dat, fname)
+    return(fname)
+  })
+  sc_indicate(summary_file, data_file=fnames)
 }
