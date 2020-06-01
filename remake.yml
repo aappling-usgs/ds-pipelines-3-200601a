@@ -1,23 +1,25 @@
-# install urbnmapr with remotes::install_github('UrbanInstitute/urbnmapr')
+target_default: main
+
 packages:
   - tidyverse
   - dataRetrieval
   - urbnmapr
 
 sources:
+  - 123_state_tasks.R
   - 1_fetch/src/find_oldest_sites.R
   - 1_fetch/src/get_site_data.R
   - 3_visualize/src/map_sites.R
 
 targets:
-  all:
+  main:
     depends:
       - 3_visualize/out/site_map.png
 
   # Configuration
   states:
     command: c(I(c(
-      'WI','MN','MI')))
+      'WI','MN','MI','IL')))
 #      'AL','AZ','AR','CA','CO','CT','DE','DC','FL','GA','ID','IL','IN','IA',
 #      'KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH',
 #      'NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX',
@@ -30,8 +32,10 @@ targets:
     command: find_oldest_sites(states, parameter)
 
   # PULL SITE DATA HERE
-  wi_data:
-    command: get_site_data(oldest_active_sites, I('WI'), parameter)
+  state_tasks:
+    command: do_state_tasks(oldest_active_sites)
+    depends:
+      - 1_fetch/src/get_site_data.R
 
   # Map oldest sites
   3_visualize/out/site_map.png:
