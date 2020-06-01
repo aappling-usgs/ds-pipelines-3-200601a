@@ -6,6 +6,7 @@ packages:
 
 sources:
   - 1_fetch/src/find_oldest_sites.R
+  - 1_fetch/src/get_site_data.R
   - 3_visualize/src/map_sites.R
 
 targets:
@@ -15,7 +16,12 @@ targets:
 
   # Configuration
   states:
-    command: c(I(c('WI','MN','MI')))
+    command: c(I(c(
+      'WI','MN','MI')))
+#      'AL','AZ','AR','CA','CO','CT','DE','DC','FL','GA','ID','IL','IN','IA',
+#      'KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH',
+#      'NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX',
+#      'UT','VT','VA','WA','WV','WI','WY','AK','HI','GU','PR')))
   parameter:
     command: c(I('00060'))
 
@@ -24,7 +30,8 @@ targets:
     command: find_oldest_sites(states, parameter)
 
   # PULL SITE DATA HERE
-
+  wi_data:
+    command: get_site_data(oldest_active_sites, I('WI'), parameter)
 
   # Map oldest sites
   3_visualize/out/site_map.png:
